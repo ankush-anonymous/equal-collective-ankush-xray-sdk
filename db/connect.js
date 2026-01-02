@@ -1,4 +1,3 @@
-const { log } = require("node:console");
 const { Pool } = require("pg");
 require("dotenv").config(); // Ensure dotenv is loaded to access environment variables
 
