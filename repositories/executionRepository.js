@@ -2,7 +2,6 @@ const { pool } = require("../db/connect");
 
 const createExecution = async (data) => {
   const {
-    schema_id,
     pipeline_name,
     environment,
     status,
@@ -12,7 +11,6 @@ const createExecution = async (data) => {
   } = data;
   const query = `
     INSERT INTO executions (
-      schema_id, 
       pipeline_name, 
       environment, 
       status, 
@@ -20,11 +18,10 @@ const createExecution = async (data) => {
       triggered_by, 
       started_at
     )
-    VALUES ($1, $2, $3, $4, $5, $6, $7)
+    VALUES ($1, $2, $3, $4, $5, $6)
     RETURNING *;
   `;
   const values = [
-    schema_id,
     pipeline_name,
     environment,
     status,

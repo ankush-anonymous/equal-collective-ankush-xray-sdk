@@ -2,14 +2,13 @@ const executionRepository = require('../repositories/executionRepository');
 
 const createExecution = async (req, res) => {
   try {
-    const { schema_id, pipeline_name, environment, status, trigger_type, triggered_by, started_at } = req.body;
+    const { pipeline_name, environment, status, trigger_type, triggered_by, started_at } = req.body;
 
-    if (!schema_id || !pipeline_name || !environment || !status || !trigger_type) {
+    if (!pipeline_name || !environment || !status || !trigger_type) {
       return res.status(400).json({ error: 'Missing required fields' });
     }
 
     const newExecution = await executionRepository.createExecution({
-      schema_id,
       pipeline_name,
       environment,
       status,

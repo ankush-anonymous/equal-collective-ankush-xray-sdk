@@ -10,29 +10,10 @@ DROP TABLE IF EXISTS executions;
 DROP TABLE IF EXISTS schema_definitions;
 
 -- =====================================================
--- SCHEMA DEFINITIONS
--- =====================================================
-CREATE TABLE schema_definitions (
-  schema_id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  pipeline_name      VARCHAR NOT NULL,
-  schema_version     INTEGER NOT NULL,
-  schema_definition  JSONB NOT NULL,
-  is_active          BOOLEAN DEFAULT FALSE,
-  created_at         TIMESTAMP DEFAULT now(),
-  UNIQUE (pipeline_name, schema_version)
-);
-
--- Ensure ONLY ONE active schema per pipeline
-CREATE UNIQUE INDEX ux_one_active_schema_per_pipeline
-ON schema_definitions (pipeline_name)
-WHERE is_active = true;
-
--- =====================================================
 -- EXECUTIONS
 -- =====================================================
 CREATE TABLE executions (
   execution_id     UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  schema_id        UUID NOT NULL,
   pipeline_name    VARCHAR NOT NULL,
   environment      VARCHAR NOT NULL,
   status           VARCHAR NOT NULL,
@@ -41,9 +22,7 @@ CREATE TABLE executions (
   started_at       TIMESTAMP NOT NULL DEFAULT now(),
   ended_at         TIMESTAMP,
   created_at       TIMESTAMP DEFAULT now(),
-  updated_at       TIMESTAMP DEFAULT now(),
-  FOREIGN KEY (schema_id)
-    REFERENCES schema_definitions (schema_id)
+  updated_at       TIMESTAMP DEFAULT now()
 );
 
 -- Indexes for executions
@@ -56,8 +35,9 @@ CREATE INDEX idx_executions_status
 CREATE INDEX idx_executions_environment
   ON executions (environment);
 
-CREATE INDEX idx_executions_schema
-  ON executions (schema_id);
+CREATE INDEX idx_executions_running_started
+ON executions (started_at)
+WHERE status = 'running';
 
 -- =====================================================
 -- EXECUTION STEPS
@@ -114,3 +94,5 @@ CREATE TABLE execution_errors (
     REFERENCES execution_steps (execution_step_id)
     ON DELETE SET NULL
 );
+
+
