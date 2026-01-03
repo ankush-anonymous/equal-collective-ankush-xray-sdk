@@ -1,5 +1,9 @@
 # X-Ray System Architecture
 
+[X-Ray System Overview Video - By Ankush Choudhary](https://drive.google.com/file/d/1Zg0Mr5lYXuSzRwgMO5Ca-XrdG4DOMDDg/view?usp=sharing)
+
+[Sample Backend Node.js - Using X-Ray SDK](https://github.com/ankush-anonymous/equal-collective-ankush-sample-backend.git)
+
 ![Overall Architecture](overall%20architecture.png)
 
 ![DB Architecture](DB%20architecture.png)
@@ -188,7 +192,7 @@ Developers choose whether to:
 
 ### Key Principle
 
-X-Ray focuses on **decision traceability**, not data exhaust. The goal is to explain what happened and why, without logging _everything_ that happened.
+X-Ray focuses on **decision traceability**, not data exhaust. The goal is to explain what happened and why, without logging \_everything* that happened.
 
 ---
 
@@ -274,7 +278,14 @@ X-Ray is diagnostic, not critical-path.
 
 ---
 
+## 6. Real-World Application
+
+In a previous project (HeyHoku), we used an LLM to recommend and generate outfits based on a user’s clothing inventory and preferences stored in a database. While the system produced results, debugging was difficult because we could only see the input data and the final output, not why specific items were selected or rejected. When recommendations felt incorrect, there was no visibility into how many outfits were filtered out, which attributes influenced decisions, or why a particular generation was favored. If X-Ray-style instrumentation had been in place, each step—attribute extraction, filtering, scoring, and generation—could have been logged with reasoning and confidence, making it possible to trace decisions end-to-end and dramatically reduce debugging and iteration time.
+
+---
+
 ## 7. Future Technical Roadmap
+
 1.  **Async Ingestion:** Implement a message queue (e.g., Redis Streams or SQS) to decouple log ingestion from DB writes.
 2.  **SDK Batching:** Buffer logs in the SDK and send them in intervals to minimize HTTP overhead.
 3.  **Retention Policies:** Implement TTL (Time-To-Live) for debug data, automatically archiving or deleting old steps.
@@ -287,16 +298,20 @@ X-Ray is diagnostic, not critical-path.
 If this SDK were shipped for real-world use, the next technical improvements would focus on latency, deployability, and developer ergonomics.
 
 ### Local-first storage
-*   Use a lightweight embedded relational database (e.g., SQLite-compatible) bundled with the SDK.
-*   This allows zero-config setup and immediate usage without external infrastructure.
-*   For larger teams or shared environments, the same storage layer could be deployed via Docker with minimal changes.
+
+- Use a lightweight embedded relational database (e.g., SQLite-compatible) bundled with the SDK.
+- This allows zero-config setup and immediate usage without external infrastructure.
+- For larger teams or shared environments, the same storage layer could be deployed via Docker with minimal changes.
 
 ### Replace HTTP with in-process calls
-*   Replace HTTP-based APIs with direct function calls within the SDK.
-*   This would significantly reduce latency and remove network overhead.
-*   Makes X-Ray suitable for high-throughput or low-latency pipelines.
+
+- Replace HTTP-based APIs with direct function calls within the SDK.
+- This would significantly reduce latency and remove network overhead.
+- Makes X-Ray suitable for high-throughput or low-latency pipelines.
 
 ### Pluggable persistence layer
+
 Allow developers to switch between:
-*   Local embedded DB
-*   Remote Postgres
+
+- Local embedded DB
+- Remote Postgres
