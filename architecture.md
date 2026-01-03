@@ -315,3 +315,26 @@ Allow developers to switch between:
 
 - Local embedded DB
 - Remote Postgres
+
+---
+
+## 9. API Reference
+
+### Executions
+- `POST /api/v1/executions` - Creates a new run; ingests pipeline metadata; outputs the initialized execution record.
+- `GET /api/v1/executions` - Retrieves runs; accepts query filters (pipeline, status); outputs a list of matching executions.
+- `GET /api/v1/executions/:id` - Retrieves a single run; ingests execution UUID; outputs full run details.
+- `PATCH /api/v1/executions/updateExecutionById/:id` - Updates a run; ingests status or timestamp changes; outputs the updated record.
+- `DELETE /api/v1/executions/deleteExecutionById/:id` - Removes a run; ingests execution UUID; outputs the deleted record.
+
+### Execution Steps
+- `POST /api/v1/execution-steps/createExecutionStep` - Logs a pipeline step; ingests inputs/outputs/reasoning JSON; outputs the stored step.
+- `GET /api/v1/execution-steps/getAllExecutionStep` - Retrieves steps; accepts filtering; outputs a list of steps.
+- `GET /api/v1/execution-steps/getExecutionStepById/:id` - Retrieves a specific step; ingests step UUID; outputs step details.
+- `DELETE /api/v1/execution-steps/deleteExecutionStepById/:id` - Removes a step; ingests step UUID; outputs the deleted record.
+
+### Execution Errors
+- `POST /api/v1/execution-errors/createExecutionError` - Logs a failure; ingests error message and stack trace; outputs the error record.
+- `GET /api/v1/execution-errors/getAllExecutionError` - Retrieves all logged errors; outputs a list of errors.
+- `GET /api/v1/execution-errors/getExecutionErrorById/:id` - Retrieves a specific error; ingests error UUID; outputs error details.
+- `DELETE /api/v1/execution-errors/deleteExecutionErrorById/:id` - Removes an error log; ingests error UUID; outputs the deleted record.
