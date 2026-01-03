@@ -33,9 +33,59 @@ const createExecution = async (data) => {
   return result.rows[0];
 };
 
-const getAllExecutions = async () => {
-  const query = "SELECT * FROM executions ORDER BY created_at DESC;";
-  const result = await pool.query(query);
+const getExecutions = async (filters) => {
+  const conditions = [];
+  const values = [];
+  let index = 1;
+
+  if (filters.pipeline_name) {
+    conditions.push(`pipeline_name = $${index++}`);
+    values.push(filters.pipeline_name);
+  }
+
+  if (filters.environment) {
+    conditions.push(`environment = $${index++}`);
+    values.push(filters.environment);
+  }
+
+  if (filters.status) {
+    conditions.push(`status = $${index++}`);
+    values.push(filters.status);
+  }
+
+  if (filters.trigger_type) {
+    conditions.push(`trigger_type = $${index++}`);
+    values.push(filters.trigger_type);
+  }
+
+  if (filters.triggered_by) {
+    conditions.push(`triggered_by = $${index++}`);
+    values.push(filters.triggered_by);
+  }
+
+  // Time range filtering (very important for executions)
+  if (filters.from) {
+    conditions.push(`started_at >= $${index++}`);
+    values.push(filters.from);
+  }
+
+  if (filters.to) {
+    conditions.push(`started_at <= $${index++}`);
+    values.push(filters.to);
+  }
+
+  const whereClause =
+    conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
+
+  const query = `
+    SELECT *
+    FROM executions
+    ${whereClause}
+    ORDER BY started_at DESC
+    LIMIT 100;
+  `;
+
+  const result = await pool.query(query, values);
   return result.rows;
 };
 
@@ -74,7 +124,7 @@ const deleteExecutionById = async (execution_id) => {
 
 module.exports = {
   createExecution,
-  getAllExecutions,
+  getExecutions,
   getExecutionById,
   updateExecutionById,
   deleteExecutionById,

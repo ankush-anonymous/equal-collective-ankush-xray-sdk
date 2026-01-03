@@ -3,7 +3,7 @@ const router = express.Router();
 const executionController = require("../controller/executionController");
 
 router.post("/createExecution", executionController.createExecution);
-router.get("/getAllExecution", executionController.getAllExecutions);
+router.get("/getAllExecution", executionController.getExecutions);
 router.get("/getExecutionById/:id", executionController.getExecutionById);
 router.patch(
   "/updateExecutionById/:id",
