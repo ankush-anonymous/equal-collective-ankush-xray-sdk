@@ -50,6 +50,37 @@ const getExecutionById = async (req, res) => {
   }
 };
 
+const updateExecutionById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updates = req.body;
+
+    // Allowed fields to update
+    const allowedUpdates = ['status', 'ended_at'];
+    const filteredUpdates = Object.keys(updates)
+      .filter(key => allowedUpdates.includes(key))
+      .reduce((obj, key) => {
+        obj[key] = updates[key];
+        return obj;
+      }, {});
+
+    if (Object.keys(filteredUpdates).length === 0) {
+      return res.status(400).json({ error: 'No valid fields provided for update' });
+    }
+
+    const updatedExecution = await executionRepository.updateExecutionById(id, filteredUpdates);
+
+    if (!updatedExecution) {
+      return res.status(404).json({ error: 'Execution not found or no changes made' });
+    }
+
+    res.status(200).json(updatedExecution);
+  } catch (error) {
+    console.error('Error updating execution:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
 const deleteExecutionById = async (req, res) => {
   try {
     const { id } = req.params;
@@ -70,5 +101,6 @@ module.exports = {
   createExecution,
   getAllExecutions,
   getExecutionById,
+  updateExecutionById,
   deleteExecutionById,
 };

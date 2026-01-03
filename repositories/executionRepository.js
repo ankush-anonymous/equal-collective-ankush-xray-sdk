@@ -45,6 +45,27 @@ const getExecutionById = async (execution_id) => {
   return result.rows[0];
 };
 
+const updateExecutionById = async (execution_id, data) => {
+  // Filter out undefined fields so we only update what is provided
+  const keys = Object.keys(data).filter((key) => data[key] !== undefined);
+  if (keys.length === 0) return null; // Nothing to update
+
+  const setClause = keys
+    .map((key, index) => `${key} = $${index + 2}`)
+    .join(", ");
+  const values = keys.map((key) => data[key]);
+
+  const query = `
+    UPDATE executions
+    SET ${setClause}, updated_at = now()
+    WHERE execution_id = $1
+    RETURNING *;
+  `;
+
+  const result = await pool.query(query, [execution_id, ...values]);
+  return result.rows[0];
+};
+
 const deleteExecutionById = async (execution_id) => {
   const query = "DELETE FROM executions WHERE execution_id = $1 RETURNING *;";
   const result = await pool.query(query, [execution_id]);
@@ -55,5 +76,6 @@ module.exports = {
   createExecution,
   getAllExecutions,
   getExecutionById,
+  updateExecutionById,
   deleteExecutionById,
 };

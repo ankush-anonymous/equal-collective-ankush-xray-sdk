@@ -49,10 +49,59 @@ const createExecutionStep = async (data) => {
   return result.rows[0];
 };
 
-const getAllExecutionSteps = async () => {
-  // Using started_at as created_at is not present in execution_steps table
-  const query = "SELECT * FROM execution_steps ORDER BY started_at DESC;";
-  const result = await pool.query(query);
+const getExecutionSteps = async (filters) => {
+  const conditions = [];
+  const values = [];
+  let index = 1;
+
+  if (filters.execution_id) {
+    conditions.push(`execution_id = $${index++}`);
+    values.push(filters.execution_id);
+  }
+
+  if (filters.step_index !== undefined) {
+    conditions.push(`step_index = $${index++}`);
+    values.push(filters.step_index);
+  }
+
+  if (filters.step_name) {
+    conditions.push(`step_name = $${index++}`);
+    values.push(filters.step_name);
+  }
+
+  if (filters.step_type) {
+    conditions.push(`step_type = $${index++}`);
+    values.push(filters.step_type);
+  }
+
+  if (filters.status) {
+    conditions.push(`status = $${index++}`);
+    values.push(filters.status);
+  }
+
+  // Time-based filtering (critical for timelines)
+  if (filters.from) {
+    conditions.push(`started_at >= $${index++}`);
+    values.push(filters.from);
+  }
+
+  if (filters.to) {
+    conditions.push(`started_at <= $${index++}`);
+    values.push(filters.to);
+  }
+
+  const whereClause =
+    conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
+
+  const query = `
+    SELECT *
+    FROM execution_steps
+    ${whereClause}
+    ORDER BY execution_id, step_index ASC
+    LIMIT 200;
+  `;
+
+  const result = await pool.query(query, values);
   return result.rows;
 };
 
@@ -71,7 +120,7 @@ const deleteExecutionStepById = async (execution_step_id) => {
 
 module.exports = {
   createExecutionStep,
-  getAllExecutionSteps,
+  getExecutionSteps,
   getExecutionStepById,
   deleteExecutionStepById,
 };

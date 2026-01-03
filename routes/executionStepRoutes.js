@@ -6,10 +6,7 @@ router.post(
   "/createExecutionStep",
   executionStepController.createExecutionStep
 );
-router.get(
-  "/getAllExecutionStep",
-  executionStepController.getAllExecutionSteps
-);
+router.get("/getAllExecutionStep", executionStepController.getExecutionSteps);
 router.get(
   "/getExecutionStepById/:id",
   executionStepController.getExecutionStepById

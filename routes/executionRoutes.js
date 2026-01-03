@@ -5,6 +5,10 @@ const executionController = require("../controller/executionController");
 router.post("/createExecution", executionController.createExecution);
 router.get("/getAllExecution", executionController.getAllExecutions);
 router.get("/getExecutionById/:id", executionController.getExecutionById);
+router.patch(
+  "/updateExecutionById/:id",
+  executionController.updateExecutionById
+);
 router.delete(
   "/deleteExecutionById/:id",
   executionController.deleteExecutionById
